@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Rural Health Camp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green-dark: #1B4332;
+            --green-mid: #2D6A4F;
+            --green-light: #52B788;
+            --green-pale: #D8F3DC;
+            --cream: #F8F6F0;
+            --text: #1A1A1A;
+            --muted: #6B7280;
+            --red: #DC2626;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            width: 55%;
+            background: var(--green-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: var(--green-mid);
+            border-radius: 50%;
+            top: -100px; right: -100px;
+            opacity: 0.4;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            background: var(--green-light);
+            border-radius: 50%;
+            bottom: -80px; left: -80px;
+            opacity: 0.2;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 60px;
+            position: relative; z-index: 1;
+        }
+
+        .brand-icon {
+            width: 48px; height: 48px;
+            background: var(--green-light);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+        }
+
+        .brand-name {
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .left-content { position: relative; z-index: 1; }
+
+        .left-content h1 {
+            font-family: 'Playfair Display', serif;
+            color: white;
+            font-size: 46px;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+
+        .left-content h1 span { color: var(--green-light); }
+
+        .left-content p {
+            color: rgba(255,255,255,0.65);
+            font-size: 16px;
+            line-height: 1.7;
+            max-width: 380px;
+            margin-bottom: 48px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: var(--green-light);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 45%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 50px;
+        }
+
+        .login-box { width: 100%; max-width: 380px; }
+
+        .login-box h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .login-box .subtitle {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 36px;
+        }
+
+        .role-selector {
+            display: flex;
+            background: #EFEFEF;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 28px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 9px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--muted);
+            transition: all 0.2s;
+        }
+
+        .role-btn.active {
+            background: white;
+            color: var(--green-dark);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 7px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: white;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus { border-color: var(--green-light); }
+
+        .error-msg {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: var(--red);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--green-dark);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.2s;
+            margin-top: 4px;
+        }
+
+        .login-btn:hover { background: var(--green-mid); }
+
+        .demo-hint {
+            margin-top: 24px;
+            padding: 14px;
+            background: var(--green-pale);
+            border-radius: 10px;
+            font-size: 12.5px;
+            color: var(--green-dark);
+            line-height: 1.6;
+        }
+
+        .demo-hint b { font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="left-panel">
+    <div class="brand">
+        <div class="brand-icon">🏥</div>
+        <span class="brand-name">Rural Health Camp Organizer</span>
+    </div>
+    <div class="left-content">
+        <h1>Healthcare<br>that reaches<br><span>every village.</span></h1>
+        <p>Register camps, track patients, record vitals, and generate NGO reports — all in one place.</p>
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-num">∞</span>
+                <span class="stat-label">Camps</span>
+            </div>
+            <div class="stat">
+                <span class="stat-num">⚡</span>
+                <span class="stat-label">Risk Alerts</span>
+            </div>
+            <div class="stat">
+                <span class="stat-num">📄</span>
+                <span class="stat-label">PDF Reports</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="right-panel">
+    <div class="login-box">
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to manage your health camps</p>
+
+        <div class="role-selector">
+            <button class="role-btn active" onclick="setRole('admin', this)">Admin / NGO</button>
+            <button class="role-btn" onclick="setRole('doctor', this)">Doctor</button>
+            <button class="role-btn" onclick="setRole('volunteer', this)">Volunteer</button>
+        </div>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter your username">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter') login()">
+        </div>
+
+        <div class="error-msg" id="error_msg">❌ Invalid credentials. Please try again.</div>
+
+        <button class="login-btn" onclick="login()">Sign In</button>
+
+        <div class="demo-hint">
+            💡 <b>Demo credentials:</b><br>
+            Admin: <b>admin</b> / <b>admin123</b><br>
+            Doctor: <b>doctor</b> / <b>doc123</b><br>
+            Volunteer: <b>volunteer</b> / <b>vol123</b>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedRole = 'admin';
+
+    const users = {
+        admin:     { pass: 'admin123',    name: 'Admin',     role: 'admin' },
+        doctor:    { pass: 'doc123',      name: 'Dr. Patil', role: 'doctor' },
+        volunteer: { pass: 'vol123',      name: 'Volunteer', role: 'volunteer' }
+    };
+
+    function setRole(role, btn) {
+        selectedRole = role;
+        document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function login() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const err = document.getElementById('error_msg');
+
+        const user = users[username];
+        if (user && user.pass === password && user.role === selectedRole) {
+            localStorage.setItem('rhc_user', JSON.stringify({ name: user.name, role: user.role }));
+            window.location.href = 'dashboard.html';
+        } else {
+            err.style.display = 'block';
+            setTimeout(() => err.style.display = 'none', 3000);
+        }
+    }
+</script>
+</body>
+</html>

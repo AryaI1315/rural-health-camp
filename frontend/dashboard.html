@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Rural Health Camp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green-dark: #1B4332;
+            --green-mid: #2D6A4F;
+            --green-light: #52B788;
+            --green-pale: #D8F3DC;
+            --cream: #F8F6F0;
+            --text: #1A1A1A;
+            --muted: #6B7280;
+            --red: #DC2626;
+            --red-pale: #FEF2F2;
+            --yellow: #D97706;
+            --yellow-pale: #FFFBEB;
+            --sidebar-w: 240px;
+        }
+
+        body { font-family: 'Inter', sans-serif; background: #F1F5F0; display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--green-dark);
+            min-height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-brand .icon {
+            width: 38px; height: 38px;
+            background: var(--green-light);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand span {
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .sidebar-user {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-user .user-name {
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .sidebar-user .user-role {
+            color: var(--green-light);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-top: 2px;
+        }
+
+        .sidebar-nav { flex: 1; padding: 16px 12px; }
+
+        .nav-section-label {
+            color: rgba(255,255,255,0.3);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 0 8px;
+            margin: 16px 0 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.6);
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: all 0.15s;
+            margin-bottom: 2px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
+        .nav-item.active { background: var(--green-mid); color: white; }
+        .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(220,38,38,0.15);
+            color: #FCA5A5;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.15s;
+        }
+
+        .logout-btn:hover { background: rgba(220,38,38,0.25); }
+
+        /* MAIN */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            padding: 32px;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .page-header p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* CARDS */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stat-card .s-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .s-green { background: var(--green-pale); }
+        .s-red { background: var(--red-pale); }
+        .s-yellow { background: var(--yellow-pale); }
+        .s-blue { background: #EFF6FF; }
+
+        .stat-card .s-num {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-card .s-label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        /* FORM CARD */
+        .form-card {
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .form-card h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1.5px solid #F3F4F6;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+        .form-grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        .col-span-2 { grid-column: span 2; }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+        .form-group label {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 13px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 9px;
+            font-size: 13.5px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus { border-color: var(--green-light); }
+
+        .form-actions { margin-top: 20px; display: flex; gap: 12px; align-items: center; }
+
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 9px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover { opacity: 0.88; }
+        .btn-primary { background: var(--green-dark); color: white; }
+        .btn-success { background: #059669; color: white; }
+        .btn-warning { background: #D97706; color: white; }
+        .btn-danger { background: var(--red); color: white; }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .alert-success { background: var(--green-pale); color: var(--green-dark); }
+        .alert-danger { background: var(--red-pale); color: var(--red); }
+        .alert-warning { background: var(--yellow-pale); color: var(--yellow); }
+
+        /* RISK BADGE */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .badge-high { background: var(--red-pale); color: var(--red); }
+        .badge-medium { background: var(--yellow-pale); color: var(--yellow); }
+        .badge-normal { background: var(--green-pale); color: var(--green-dark); }
+
+        /* TABLE */
+        .table-wrap { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+        th { background: #F9FAFB; color: var(--muted); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.6px; padding: 11px 14px; text-align: left; }
+        td { padding: 12px 14px; border-bottom: 1px solid #F3F4F6; color: var(--text); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #FAFAF9; }
+
+        /* REPORT */
+        .report-box {
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+        }
+
+        .report-box h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1.5px solid #F3F4F6;
+        }
+
+        .id-hint {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="icon">🏥</div>
+        <span>Rural Health<br>Camp Organizer</span>
+    </div>
+    <div class="sidebar-user">
+        <div class="user-name" id="user_name">Loading...</div>
+        <div class="user-role" id="user_role">—</div>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">Overview</div>
+        <button class="nav-item active" onclick="showPage('home', this)">
+            <span class="nav-icon">🏠</span> Dashboard
+        </button>
+
+        <div class="nav-section-label">Manage</div>
+        <button class="nav-item" onclick="showPage('camps', this)">
+            <span class="nav-icon">🏕️</span> Camps
+        </button>
+        <button class="nav-item" onclick="showPage('patients', this)">
+            <span class="nav-icon">👤</span> Patients
+        </button>
+        <button class="nav-item" onclick="showPage('vitals', this)">
+            <span class="nav-icon">🩺</span> Vitals
+        </button>
+
+        <div class="nav-section-label">Reports</div>
+        <button class="nav-item" onclick="showPage('reports', this)">
+            <span class="nav-icon">📄</span> PDF Reports
+        </button>
+    </nav>
+    <div class="sidebar-footer">
+        <button class="logout-btn" onclick="logout()">🚪 Sign Out</button>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+        <div class="page-header">
+            <h2>Dashboard</h2>
+            <p>Overview of all health camps and patients</p>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="s-icon s-green">🏕️</div>
+                <div class="s-num" id="stat-camps">—</div>
+                <div class="s-label">Total Camps</div>
+            </div>
+            <div class="stat-card">
+                <div class="s-icon s-blue">👥</div>
+                <div class="s-num" id="stat-patients">—</div>
+                <div class="s-label">Total Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="s-icon s-red">⚠️</div>
+                <div class="s-num" id="stat-highrisk">—</div>
+                <div class="s-label">High Risk Patients</div>
+            </div>
+            <div class="stat-card">
+                <div class="s-icon s-yellow">📋</div>
+                <div class="s-num" id="stat-vitals">—</div>
+                <div class="s-label">Vitals Recorded</div>
+            </div>
+        </div>
+
+        <div class="form-card">
+            <h3>📋 Recent Camps</h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Camp Name</th>
+                            <th>Village</th>
+                            <th>District</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Camp ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="camps-table">
+                        <tr><td colspan="6" style="text-align:center;color:var(--muted)">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAMPS PAGE -->
+    <div class="page" id="page-camps">
+        <div class="page-header">
+            <h2>Register New Camp</h2>
+            <p>Add a new rural health camp to the system</p>
+        </div>
+
+        <div class="form-card">
+            <h3>🏕️ Camp Details</h3>
+            <div class="form-grid">
+                <div class="form-group col-span-2">
+                    <label>Camp Name</label>
+                    <input type="text" id="c_name" placeholder="e.g. Shirol Village Health Camp">
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="c_date">
+                </div>
+                <div class="form-group">
+                    <label>Organized By</label>
+                    <input type="text" id="c_org" placeholder="NGO or organization name">
+                </div>
+                <div class="form-group">
+                    <label>Village</label>
+                    <input type="text" id="c_village" placeholder="Village name">
+                </div>
+                <div class="form-group">
+                    <label>District</label>
+                    <input type="text" id="c_district" placeholder="e.g. Kolhapur">
+                </div>
+                <div class="form-group">
+                    <label>Latitude</label>
+                    <input type="number" id="c_lat" placeholder="e.g. 16.7" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label>Longitude</label>
+                    <input type="number" id="c_lng" placeholder="e.g. 74.5" step="0.0001">
+                </div>
+                <div class="form-group col-span-2">
+                    <label>Doctors (comma separated)</label>
+                    <input type="text" id="c_doctors" placeholder="e.g. Dr. Patil, Dr. More">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="createCamp()">Create Camp</button>
+                <div class="alert alert-success" id="camp_alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PATIENTS PAGE -->
+    <div class="page" id="page-patients">
+        <div class="page-header">
+            <h2>Register Patient</h2>
+            <p>Add a new patient to a health camp</p>
+        </div>
+
+        <div class="form-card">
+            <h3>👤 Patient Details</h3>
+            <div class="form-grid three">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="p_name" placeholder="Patient's full name">
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="p_age" placeholder="Age in years">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="p_gender">
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="p_phone" placeholder="10-digit mobile number">
+                </div>
+                <div class="form-group">
+                    <label>Village</label>
+                    <input type="text" id="p_village" placeholder="Patient's village">
+                </div>
+                <div class="form-group">
+                    <label>Camp ID</label>
+                    <input type="text" id="p_camp_id" placeholder="Paste Camp ID here">
+                    <span class="id-hint">Get Camp ID from Dashboard → Recent Camps</span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-success" onclick="registerPatient()">Register Patient</button>
+                <div class="alert alert-success" id="patient_alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VITALS PAGE -->
+    <div class="page" id="page-vitals">
+        <div class="page-header">
+            <h2>Record Vitals</h2>
+            <p>Enter patient vitals — risk level is calculated automatically</p>
+        </div>
+
+        <div class="form-card">
+            <h3>🩺 Patient Vitals</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Patient DB ID</label>
+                    <input type="text" id="v_pid" placeholder="Patient's database ID">
+                    <span class="id-hint">Get this from the patient registration response</span>
+                </div>
+                <div class="form-group">
+                    <label>Camp ID</label>
+                    <input type="text" id="v_cid" placeholder="Camp ID">
+                </div>
+                <div class="form-group">
+                    <label>Blood Pressure</label>
+                    <input type="text" id="v_bp" placeholder="e.g. 130/85">
+                </div>
+                <div class="form-group">
+                    <label>Blood Sugar (mg/dL)</label>
+                    <input type="number" id="v_sugar" placeholder="e.g. 110">
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="v_weight" placeholder="e.g. 62">
+                </div>
+                <div class="form-group">
+                    <label>Height (cm)</label>
+                    <input type="number" id="v_height" placeholder="e.g. 155">
+                </div>
+                <div class="form-group">
+                    <label>Hemoglobin (g/dL)</label>
+                    <input type="number" id="v_hb" placeholder="e.g. 10.2" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Diagnosis</label>
+                    <input type="text" id="v_diag" placeholder="e.g. Mild Anemia">
+                </div>
+                <div class="form-group col-span-2">
+                    <label>Medicines Given (comma separated)</label>
+                    <input type="text" id="v_meds" placeholder="e.g. Iron tablets, Vitamin B12">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-warning" onclick="recordVitals()">Record Vitals</button>
+            </div>
+            <div class="alert" id="vitals_alert" style="margin-top:16px"></div>
+        </div>
+    </div>
+
+    <!-- REPORTS PAGE -->
+    <div class="page" id="page-reports">
+        <div class="page-header">
+            <h2>PDF Reports</h2>
+            <p>Generate and download camp reports for NGOs and government</p>
+        </div>
+
+        <div class="report-box">
+            <h3>📄 Generate Camp Report</h3>
+            <div class="form-grid">
+                <div class="form-group col-span-2">
+                    <label>Camp ID</label>
+                    <input type="text" id="r_camp_id" placeholder="Paste the Camp ID to generate report">
+                    <span class="id-hint">Get Camp ID from Dashboard → Recent Camps table</span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-danger" onclick="downloadReport()">⬇️ Download PDF Report</button>
+            </div>
+            <div style="margin-top:24px; padding:16px; background:#F9FAFB; border-radius:10px;">
+                <p style="font-size:13px; color:var(--muted); line-height:1.7;">
+                    📋 The report includes:<br>
+                    • Camp name, date, location, and organizing NGO<br>
+                    • Summary of total, high-risk, medium-risk, and normal patients<br>
+                    • Full patient details table with vitals and risk flags<br>
+                    • Auto-generated timestamp
+                </p>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    const API = "http://127.0.0.1:8000";
+
+    // Auth check
+    window.onload = () => {
+        const user = JSON.parse(localStorage.getItem('rhc_user') || 'null');
+        if (!user) { window.location.href = 'login.html'; return; }
+        document.getElementById('user_name').textContent = user.name;
+        document.getElementById('user_role').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+        loadDashboard();
+    };
+
+    function logout() {
+        localStorage.removeItem('rhc_user');
+        window.location.href = 'login.html';
+    }
+
+    function showPage(name, btn) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('page-' + name).classList.add('active');
+        btn.classList.add('active');
+        if (name === 'home') loadDashboard();
+    }
+
+    function showAlert(id, msg, type) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.className = `alert alert-${type}`;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 5000);
+    }
+
+    async function loadDashboard() {
+        try {
+            const [campsRes, patientsRes, vitalsRes] = await Promise.all([
+                fetch(`${API}/camps/`),
+                fetch(`${API}/patients/camp/all`).catch(() => ({ json: () => [] })),
+                fetch(`${API}/vitals/all`).catch(() => ({ json: () => [] }))
+            ]);
+
+            const camps = await campsRes.json();
+            document.getElementById('stat-camps').textContent = camps.length;
+
+            // Populate camps table
+            const tbody = document.getElementById('camps-table');
+            if (camps.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">No camps yet. Go to Camps to create one!</td></tr>';
+            } else {
+                tbody.innerHTML = camps.map(c => `
+                    <tr>
+                        <td><b>${c.camp_name}</b></td>
+                        <td>${c.village}</td>
+                        <td>${c.district}</td>
+                        <td>${c.date}</td>
+                        <td><span class="badge badge-normal">${c.status}</span></td>
+                        <td style="font-family:monospace;font-size:11px;color:var(--muted)">${c._id}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // Load patient count
+            let totalPatients = 0;
+            let highRisk = 0;
+            let totalVitals = 0;
+            for (const camp of camps) {
+                try {
+                    const pRes = await fetch(`${API}/patients/camp/${camp._id}`);
+                    const patients = await pRes.json();
+                    totalPatients += patients.length;
+
+                    for (const p of patients) {
+                        const vRes = await fetch(`${API}/vitals/${p._id}`);
+                        const vitals = await vRes.json();
+                        if (vitals.length > 0) {
+                            totalVitals += vitals.length;
+                            if (vitals[0].risk_level === 'High') highRisk++;
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            document.getElementById('stat-patients').textContent = totalPatients;
+            document.getElementById('stat-highrisk').textContent = highRisk;
+            document.getElementById('stat-vitals').textContent = totalVitals;
+
+        } catch (e) {
+            document.getElementById('camps-table').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted)">Could not connect to API. Is server running?</td></tr>';
+        }
+    }
+
+    async function createCamp() {
+        const data = {
+            camp_name: document.getElementById('c_name').value,
+            date: document.getElementById('c_date').value,
+            village: document.getElementById('c_village').value,
+            district: document.getElementById('c_district').value,
+            state: "Maharashtra",
+            organized_by: document.getElementById('c_org').value,
+            doctors: document.getElementById('c_doctors').value.split(',').map(d => d.trim()),
+            location: {
+                latitude: parseFloat(document.getElementById('c_lat').value),
+                longitude: parseFloat(document.getElementById('c_lng').value)
+            },
+            status: "upcoming"
+        };
+        try {
+            const res = await fetch(`${API}/camps/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const json = await res.json();
+            showAlert('camp_alert', `✅ Camp created! ID: ${json.camp_id}`, 'success');
+        } catch(e) {
+            showAlert('camp_alert', '❌ Failed to create camp. Is server running?', 'danger');
+        }
+    }
+
+    async function registerPatient() {
+        const data = {
+            name: document.getElementById('p_name').value,
+            age: parseInt(document.getElementById('p_age').value),
+            gender: document.getElementById('p_gender').value,
+            phone: document.getElementById('p_phone').value,
+            village: document.getElementById('p_village').value,
+            camp_id: document.getElementById('p_camp_id').value
+        };
+        try {
+            const res = await fetch(`${API}/patients/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const json = await res.json();
+            showAlert('patient_alert', `✅ Patient registered! Patient ID: ${json.patient_id} | DB ID: ${json.db_id}`, 'success');
+        } catch(e) {
+            showAlert('patient_alert', '❌ Failed. Check Camp ID and server.', 'danger');
+        }
+    }
+
+    async function recordVitals() {
+        const data = {
+            patient_id: document.getElementById('v_pid').value,
+            camp_id: document.getElementById('v_cid').value,
+            blood_pressure: document.getElementById('v_bp').value,
+            blood_sugar: parseFloat(document.getElementById('v_sugar').value),
+            weight: parseFloat(document.getElementById('v_weight').value),
+            height: parseFloat(document.getElementById('v_height').value),
+            hemoglobin: parseFloat(document.getElementById('v_hb').value),
+            diagnosis: document.getElementById('v_diag').value,
+            medicines_given: document.getElementById('v_meds').value.split(',').map(m => m.trim())
+        };
+        try {
+            const res = await fetch(`${API}/vitals/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            const json = await res.json();
+            const type = json.risk_level === 'High' ? 'danger' : json.risk_level === 'Medium' ? 'warning' : 'success';
+            const flags = json.risk_flags.length ? json.risk_flags.join(' | ') : 'None';
+            showAlert('vitals_alert', `✅ Vitals saved! BMI: ${json.bmi} | Risk: ${json.risk_level} | Flags: ${flags}`, type);
+        } catch(e) {
+            showAlert('vitals_alert', '❌ Failed. Check Patient ID and server.', 'danger');
+        }
+    }
+
+    function downloadReport() {
+        const id = document.getElementById('r_camp_id').value.trim();
+        if (!id) { alert('Please enter a Camp ID'); return; }
+        window.open(`${API}/reports/${id}`, '_blank');
+    }
+</script>
+</body>
+</html>
